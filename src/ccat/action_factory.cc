@@ -5,6 +5,8 @@
 
 #include <clang/ASTMatchers/ASTMatchFinder.h>
 #include <clang/Frontend/CompilerInstance.h>
+#include <clang/Lex/PreprocessorOptions.h>
+
 #include <memory>
 #include <vector>
 
@@ -39,6 +41,16 @@ std::unique_ptr<clang::ASTConsumer> Action::CreateASTConsumer(
 
   return std::make_unique<ASTConsumer>(std::move(consumers), std::move(finder),
                                        std::move(checks));
+}
+
+bool ActionFactory::runInvocation(
+    std::shared_ptr<clang::CompilerInvocation> Invocation,
+    clang::FileManager *Files,
+    std::shared_ptr<clang::PCHContainerOperations> PCHContainerOps,
+    clang::DiagnosticConsumer *DiagConsumer) {
+  Invocation->getPreprocessorOpts().SetUpStaticAnalyzer = true;
+  return FrontendActionFactory::runInvocation(Invocation, Files,
+                                              PCHContainerOps, DiagConsumer);
 }
 
 std::unique_ptr<clang::FrontendAction> ActionFactory::create() {

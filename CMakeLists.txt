@@ -82,6 +82,28 @@ endif()
 
 find_package(Clang REQUIRED)
 
+if(NOT CLANG_RESOURCE_DIR)
+  find_program(CLANG_EXECUTABLE clang++)
+
+  if(NOT CLANG_EXECUTABLE)
+    message(FATAL_ERROR "clang executable not found.")
+  endif()
+
+  execute_process(
+    COMMAND ${CLANG_EXECUTABLE} -print-resource-dir
+    RESULT_VARIABLE CLANG_FIND_RESOURCE_DIR_RESULT
+    OUTPUT_VARIABLE CLANG_RESOURCE_DIR
+    ERROR_VARIABLE CLANG_FIND_RESOURCE_DIR_ERROR
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+  message(NOTICE "clang-resource-dir: ${CLANG_RESOURCE_DIR}")
+
+  if(CLANG_FIND_RESOURCE_DIR_RESULT)
+    message(FATAL_ERROR "Error retrieving Clang resource directory with Clang \
+            executable. Output:\n ${CLANG_FIND_RESOURCE_DIR_ERROR}")
+  endif()
+endif()
+
 target_link_libraries(
   ccat
   PRIVATE clangIndex
@@ -98,8 +120,181 @@ target_link_libraries(
           clangLex
           clangDriver
           clangBasic
+          clangHandleLLVM
+          clangTidyLLVMLibcModule
+          clangTidyLLVMModule
+          LLVMAArch64AsmParser
+          LLVMAArch64CodeGen
+          LLVMAArch64Desc
+          LLVMAArch64Disassembler
+          LLVMAArch64Info
+          LLVMAArch64Utils
+          LLVMAggressiveInstCombine
+          LLVMAMDGPUAsmParser
+          LLVMAMDGPUCodeGen
+          LLVMAMDGPUDesc
+          LLVMAMDGPUDisassembler
+          LLVMAMDGPUInfo
+          LLVMAMDGPUTargetMCA
+          LLVMAMDGPUUtils
+          LLVMAnalysis
+          LLVMARMAsmParser
+          LLVMARMCodeGen
+          LLVMARMDesc
+          LLVMARMDisassembler
+          LLVMARMInfo
+          LLVMARMUtils
+          LLVMAsmParser
+          LLVMAsmPrinter
+          LLVMAVRAsmParser
+          LLVMAVRCodeGen
+          LLVMAVRDesc
+          LLVMAVRDisassembler
+          LLVMAVRInfo
+          LLVMBinaryFormat
+          LLVMBitReader
+          LLVMBitstreamReader
+          LLVMBitWriter
+          LLVMBPFAsmParser
+          LLVMBPFCodeGen
+          LLVMBPFDesc
+          LLVMBPFDisassembler
+          LLVMBPFInfo
+          LLVMCFGuard
+          LLVMCFIVerify
+          LLVMCodeGen
+          LLVMCore
+          LLVMCoroutines
+          LLVMCoverage
+          LLVMDebugInfoCodeView
+          LLVMDebuginfod
+          LLVMDebugInfoDWARF
+          LLVMDebugInfoGSYM
+          LLVMDebugInfoMSF
+          LLVMDebugInfoPDB
+          LLVMDemangle
+          LLVMDiff
+          LLVMDlltoolDriver
+          LLVMDWARFLinker
+          LLVMDWP
+          LLVMExecutionEngine
+          LLVMExegesis
+          LLVMExegesisAArch64
+          LLVMExegesisMips
+          LLVMExegesisPowerPC
+          LLVMExegesisX86
+          LLVMExtensions
+          LLVMFileCheck
+          LLVMFrontendOpenACC
+          LLVMFrontendOpenMP
+          LLVMFuzzerCLI
+          LLVMFuzzMutate
+          LLVMGlobalISel
+          LLVMHexagonAsmParser
+          LLVMHexagonCodeGen
+          LLVMHexagonDesc
+          LLVMHexagonDisassembler
+          LLVMHexagonInfo
+          LLVMInstCombine
+          LLVMInstrumentation
+          LLVMInterfaceStub
+          LLVMInterpreter
+          LLVMipo
+          LLVMIRReader
+          LLVMJITLink
+          LLVMLanaiAsmParser
+          LLVMLanaiCodeGen
+          LLVMLanaiDesc
+          LLVMLanaiDisassembler
+          LLVMLanaiInfo
+          LLVMLibDriver
+          LLVMLinker
+          LLVMLTO
+          LLVMMC
+          LLVMMCA
+          LLVMMCDisassembler
+          LLVMMCJIT
+          LLVMMCParser
+          LLVMMipsAsmParser
+          LLVMMipsCodeGen
+          LLVMMipsDesc
+          LLVMMipsDisassembler
+          LLVMMipsInfo
+          LLVMMIRParser
+          LLVMMSP430AsmParser
+          LLVMMSP430CodeGen
+          LLVMMSP430Desc
+          LLVMMSP430Disassembler
+          LLVMMSP430Info
+          LLVMNVPTXCodeGen
+          LLVMNVPTXDesc
+          LLVMNVPTXInfo
+          LLVMObjCARCOpts
+          LLVMObjCopy
+          LLVMObject
+          LLVMObjectYAML
           LLVMOption
-          LLVMSupport)
+          LLVMOrcJIT
+          LLVMOrcShared
+          LLVMOrcTargetProcess
+          LLVMPasses
+          LLVMPowerPCAsmParser
+          LLVMPowerPCCodeGen
+          LLVMPowerPCDesc
+          LLVMPowerPCDisassembler
+          LLVMPowerPCInfo
+          LLVMProfileData
+          LLVMRemarks
+          LLVMRISCVAsmParser
+          LLVMRISCVCodeGen
+          LLVMRISCVDesc
+          LLVMRISCVDisassembler
+          LLVMRISCVInfo
+          LLVMRuntimeDyld
+          LLVMScalarOpts
+          LLVMSelectionDAG
+          LLVMSparcAsmParser
+          LLVMSparcCodeGen
+          LLVMSparcDesc
+          LLVMSparcDisassembler
+          LLVMSparcInfo
+          LLVMSupport
+          LLVMSymbolize
+          LLVMSystemZAsmParser
+          LLVMSystemZCodeGen
+          LLVMSystemZDesc
+          LLVMSystemZDisassembler
+          LLVMSystemZInfo
+          LLVMTableGen
+          LLVMTableGenGlobalISel
+          LLVMTarget
+          LLVMTextAPI
+          LLVMTransformUtils
+          LLVMVEAsmParser
+          LLVMVECodeGen
+          LLVMVectorize
+          LLVMVEDesc
+          LLVMVEDisassembler
+          LLVMVEInfo
+          LLVMWebAssemblyAsmParser
+          LLVMWebAssemblyCodeGen
+          LLVMWebAssemblyDesc
+          LLVMWebAssemblyDisassembler
+          LLVMWebAssemblyInfo
+          LLVMWebAssemblyUtils
+          LLVMWindowsDriver
+          LLVMWindowsManifest
+          LLVMX86AsmParser
+          LLVMX86CodeGen
+          LLVMX86Desc
+          LLVMX86Disassembler
+          LLVMX86Info
+          LLVMX86TargetMCA
+          LLVMXCoreCodeGen
+          LLVMXCoreDesc
+          LLVMXCoreDisassembler
+          LLVMXCoreInfo
+          LLVMXRay)
 
 target_compile_options(ccat PRIVATE ${PEDANTIC_COMPILE_FLAGS} ${WERROR_FLAG})
 
@@ -110,4 +305,10 @@ target_include_directories(ccat SYSTEM PRIVATE ${CLANG_INCLUDE_DIRS})
 target_sources(
   ccat
   PRIVATE ./src/main.cc ./src/ccat/action_factory.cc ./src/ccat/check_base.cc
-          ./src/checkers/loop-reverse-unsigned-type-check.cc)
+          ./src/utils.cc ./src/checkers/loop-reverse-unsigned-type-check.cc)
+
+set_property(
+  SOURCE ./src/utils.cc
+  APPEND
+  PROPERTY COMPILE_DEFINITIONS
+           CLANG_RESOURCE_DIRECTORY=R"\(${CLANG_RESOURCE_DIR}\)")

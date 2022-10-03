@@ -2,18 +2,24 @@
 //
 
 #include <clang/Serialization/PCHContainerOperations.h>
+#include <clang/Tooling/ArgumentsAdjusters.h>
 #include <clang/Tooling/CommonOptionsParser.h>
 #include <clang/Tooling/Tooling.h>
 #include <llvm/ADT/IntrusiveRefCntPtr.h>
+#include <llvm/ADT/StringRef.h>
 #include <llvm/Support/CommandLine.h>
+#include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/VirtualFileSystem.h>
 #include <llvm/Support/WithColor.h>
+#include <iostream>
 #include <memory>
+#include <sstream>
 
 #include "ccat/action_factory.hh"
 #include "ccat/check_base.hh"
 #include "ccat/context.hh"
 #include "checkers/loop-reverse-unsigned-type-check.hh"
+#include "utils.hh"
 
 using clang::PCHContainerOperations;
 using clang::tooling::ClangTool;
@@ -38,11 +44,34 @@ int main(int argc, const char *argv[]) {
     return 1;
   }
 
-  llvm::IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> base_fs(
-      new llvm::vfs::OverlayFileSystem(llvm::vfs::getRealFileSystem()));
+  llvm::InitializeAllTargetInfos();
+  llvm::InitializeAllTargetMCs();
+  llvm::InitializeAllAsmParsers();
 
-  ClangTool tool(opts->getCompilations(), opts->getSourcePathList(),
-                 std::make_shared<PCHContainerOperations>(), base_fs);
+  ClangTool tool(opts->getCompilations(), opts->getSourcePathList());
+
+  clang::tooling::ArgumentsAdjuster libclang_arguments_inserter =
+      [](const clang::tooling::CommandLineArguments& Args,
+         llvm::StringRef Filename) {
+        (void)Filename;
+        (void)Args;
+        clang::tooling::CommandLineArguments AdjustedArgs = Args;
+
+        auto I = AdjustedArgs.begin();
+        if (I != AdjustedArgs.end() && !llvm::StringRef(*I).startswith("-")) {
+          ++I;
+        }
+
+        std::ostringstream oss;
+        oss << "-I" << ccat::ClangResourceDir << "/include";
+
+        AdjustedArgs.insert(I, oss.str());
+
+        return AdjustedArgs;
+      };
+
+  tool.appendArgumentsAdjuster(libclang_arguments_inserter);
+  tool.appendArgumentsAdjuster(clang::tooling::getStripPluginsAdjuster());
 
   ccat::CCatContext ctx;
   ccat::ActionFactory factory(&ctx);

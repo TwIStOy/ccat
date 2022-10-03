@@ -26,7 +26,13 @@ class ActionFactory : public clang::tooling::FrontendActionFactory {
   explicit ActionFactory(CCatContext *ctx) : ctx_(ctx) {
   }
 
-  std::unique_ptr<clang::FrontendAction> create();
+  bool runInvocation(
+      std::shared_ptr<clang::CompilerInvocation> Invocation,
+      clang::FileManager *Files,
+      std::shared_ptr<clang::PCHContainerOperations> PCHContainerOps,
+      clang::DiagnosticConsumer *DiagConsumer) override;
+
+  std::unique_ptr<clang::FrontendAction> create() override;
 
  private:
   CCatContext *ctx_;
