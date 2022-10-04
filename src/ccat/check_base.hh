@@ -4,6 +4,9 @@
 #pragma once  // NOLINT(build/header_guard)
 
 #include <clang/ASTMatchers/ASTMatchFinder.h>
+#include <clang/Basic/DiagnosticIDs.h>
+#include <clang/Basic/SourceLocation.h>
+#include <llvm/ADT/StringRef.h>
 
 #include <list>
 #include <memory>
@@ -33,6 +36,10 @@ class CheckBase : public MatchFinder::MatchCallback {
   // emit when a registered matcher is matched
   virtual void OnMatched(const MatchFinder::MatchResult& result,
                          CCatContext *ctx) = 0;
+
+  clang::DiagnosticBuilder Report(
+      llvm::StringRef name, clang::SourceLocation loc, llvm::StringRef desc,
+      clang::DiagnosticIDs::Level level = clang::DiagnosticIDs::Level::Warning);
 
  private:
   void run(const MatchFinder::MatchResult& Result) final;

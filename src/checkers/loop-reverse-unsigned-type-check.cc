@@ -3,13 +3,17 @@
 
 #include "checkers/loop-reverse-unsigned-type-check.hh"
 
+#include <clang/AST/Decl.h>
 #include <clang/ASTMatchers/ASTMatchers.h>
 #include <clang/Lex/Lexer.h>
 #include <iostream>
+#include <string_view>
 
 namespace ccat {
 
 using namespace clang::ast_matchers;
+
+static constexpr std::string_view CheckName = "loop-reverse-unsigned-type";
 
 bool LoopReverseUnsignedTypeCheck::Enabled(CCatContext *ctx) const {
   // 20, 2a
@@ -48,11 +52,14 @@ void LoopReverseUnsignedTypeCheck::OnMatched(
   (void)result;
   (void)ctx;
 
-  std::cout << "FUCK" << std::endl;
+  const auto init_var = result.Nodes.getNodeAs<clang::ValueDecl>("initVar");
+
+  Report(CheckName, init_var->getLocation(),
+         "call signed version 'ssize' instead");
 }
 
 std::string_view LoopReverseUnsignedTypeCheckFactory::Name() const {
-  return "loop-reverse-unsigned-type";
+  return CheckName;
 }
 
 CheckPtr LoopReverseUnsignedTypeCheckFactory::CreateCheck() const {

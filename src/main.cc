@@ -1,6 +1,8 @@
 // Copyright (c) 2020 - present, Hawtian Wang (twistoy.wang@gmail.com)
 //
 
+#include <clang/Frontend/LogDiagnosticPrinter.h>
+#include <clang/Frontend/TextDiagnosticPrinter.h>
 #include <clang/Serialization/PCHContainerOperations.h>
 #include <clang/Tooling/ArgumentsAdjusters.h>
 #include <clang/Tooling/CommonOptionsParser.h>
@@ -11,6 +13,8 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/VirtualFileSystem.h>
 #include <llvm/Support/WithColor.h>
+#include <llvm/Support/raw_ostream.h>
+
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -74,6 +78,15 @@ int main(int argc, const char *argv[]) {
   tool.appendArgumentsAdjuster(clang::tooling::getStripPluginsAdjuster());
 
   ccat::CCatContext ctx;
+  std::error_code ec;
+  llvm::raw_fd_ostream output("-", ec);
+  clang::TextDiagnosticPrinter printer(output, new clang::DiagnosticOptions(),
+                                       false);
+  clang::DiagnosticsEngine diag_engine(new clang::DiagnosticIDs(),
+                                       new clang::DiagnosticOptions(), &printer,
+                                       false);
+  ctx.DiagEngine = &diag_engine;
+
   ccat::ActionFactory factory(&ctx);
   return tool.run(&factory);
 }

@@ -23,6 +23,7 @@ std::unique_ptr<clang::ASTConsumer> Action::CreateASTConsumer(
   ctx_->SourceManager = &CI.getSourceManager();
   ctx_->File          = InFile;
   ctx_->AstContext    = &CI.getASTContext();
+  ctx_->DiagEngine->setSourceManager(ctx_->SourceManager);
 
   clang::ast_matchers::MatchFinder::MatchFinderOptions finder_opts;
   auto finder = std::make_unique<clang::ast_matchers::MatchFinder>(finder_opts);
@@ -31,6 +32,7 @@ std::unique_ptr<clang::ASTConsumer> Action::CreateASTConsumer(
   for (const auto& f : CheckFactories::Instance().Factories) {
     auto check = f->CreateCheck();
     check->RegisterMatcher(finder.get());
+    check->SetupContext(ctx_);
     checks.push_back(std::move(check));
   }
 

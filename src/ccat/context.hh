@@ -4,6 +4,7 @@
 #pragma once  // NOLINT(build/header_guard)
 
 #include <clang/AST/ASTContext.h>
+#include <clang/Basic/Diagnostic.h>
 #include <clang/Basic/SourceManager.h>
 #include <llvm/ADT/StringRef.h>
 
@@ -13,6 +14,7 @@ struct CCatContext {
   clang::SourceManager *SourceManager;
   llvm::StringRef File;
   clang::ASTContext* AstContext;
+  clang::DiagnosticsEngine* DiagEngine;
 };
 
 }  // namespace ccat
