@@ -26,13 +26,23 @@ static const StatementMatcher incrementVarMatcher() {
   return declRefExpr(to(varDecl(equalsBoundNode("initVar"))));
 }
 
+static auto InitVar = "initVar";
+
+static auto kLiteralZero = integerLiteral(equals(0));
+static auto kLiteralOne  = integerLiteral(equals(1));
+
+static auto member_function(const char *name) {
+  return cxxMemberCallExpr(callee(cxxMethodDecl(hasName(name))));
+}
+
 void LoopReverseUnsignedTypeCheck::RegisterMatcher(MatchFinder *finder) {
-  auto zero_literal = integerLiteral(equals(0));
-  auto loop_init    = declStmt(hasSingleDecl(
-      varDecl(hasType(isUnsignedInteger()),
-                 hasInitializer(ignoringParenImpCasts(
-                  cxxMemberCallExpr(callee(cxxMethodDecl(hasName("size")))))))
-          .bind("initVar")));
+  auto size_minus_one =
+      binaryOperation(hasOperatorName("-"), hasLHS(member_function("size")),
+                      hasRHS(ignoringParenImpCasts(kLiteralOne)));
+
+  auto loop_init = declStmt(hasSingleDecl(
+      varDecl(hasType(isUnsignedInteger()), hasInitializer(size_minus_one))
+          .bind(InitVar)));
 
   auto condition =
       binaryOperator(hasOperatorName(">="),
@@ -52,7 +62,7 @@ void LoopReverseUnsignedTypeCheck::OnMatched(
   (void)result;
   (void)ctx;
 
-  const auto init_var = result.Nodes.getNodeAs<clang::ValueDecl>("initVar");
+  const auto init_var = result.Nodes.getNodeAs<clang::ValueDecl>(InitVar);
 
   Report(CheckName, init_var->getLocation(),
          "call signed version 'ssize' instead");
