@@ -18,6 +18,9 @@
 #include <iostream>
 #include <memory>
 #include <sstream>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "ccat/action_factory.hh"
 #include "ccat/check_base.hh"
@@ -74,18 +77,43 @@ int main(int argc, const char *argv[]) {
         return AdjustedArgs;
       };
 
+  clang::tooling::ArgumentsAdjuster remove_unknown_arguments =
+      [](const clang::tooling::CommandLineArguments& args,
+         llvm::StringRef filename) {
+        (void)filename;
+        static std::unordered_set<std::string> unknown_warnings = {
+            "-Wtrampolines",        "-Wuseless-cast",
+            "-Wsized-deallocation", "-Wshift-overflow=2",
+            "-Wduplicated-cond",    "-Wtrampolines",
+            "-Wuseless-cast",       "-Wvector-operation-performance",
+            "-Wsized-deallocation",
+        };
+        clang::tooling::CommandLineArguments res;
+        for (const auto& x : args) {
+          if (unknown_warnings.contains(x)) {
+            continue;
+          } else {
+            res.push_back(x);
+          }
+        }
+        return res;
+      };
+
+  tool.appendArgumentsAdjuster(remove_unknown_arguments);
   tool.appendArgumentsAdjuster(libclang_arguments_inserter);
   tool.appendArgumentsAdjuster(clang::tooling::getStripPluginsAdjuster());
 
   ccat::CCatContext ctx;
   std::error_code ec;
   llvm::raw_fd_ostream output("-", ec);
+  output.enable_colors(true);
+
   clang::TextDiagnosticPrinter printer(output, new clang::DiagnosticOptions(),
                                        false);
   clang::DiagnosticsEngine diag_engine(new clang::DiagnosticIDs(),
                                        new clang::DiagnosticOptions(), &printer,
                                        false);
-  ctx.DiagEngine = &diag_engine;
+  ctx.DiagEngine   = &diag_engine;
   ctx.DiagConsumer = &printer;
 
   ccat::ActionFactory factory(&ctx);
