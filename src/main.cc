@@ -86,6 +86,7 @@ int main(int argc, const char *argv[]) {
                                        new clang::DiagnosticOptions(), &printer,
                                        false);
   ctx.DiagEngine = &diag_engine;
+  ctx.DiagConsumer = &printer;
 
   ccat::ActionFactory factory(&ctx);
   return tool.run(&factory);

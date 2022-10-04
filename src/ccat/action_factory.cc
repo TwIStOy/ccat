@@ -24,6 +24,7 @@ std::unique_ptr<clang::ASTConsumer> Action::CreateASTConsumer(
   ctx_->File          = InFile;
   ctx_->AstContext    = &CI.getASTContext();
   ctx_->DiagEngine->setSourceManager(ctx_->SourceManager);
+  ctx_->DiagConsumer->BeginSourceFile(CI.getLangOpts(), &CI.getPreprocessor());
 
   clang::ast_matchers::MatchFinder::MatchFinderOptions finder_opts;
   auto finder = std::make_unique<clang::ast_matchers::MatchFinder>(finder_opts);

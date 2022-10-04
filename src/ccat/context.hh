@@ -13,8 +13,9 @@ namespace ccat {
 struct CCatContext {
   clang::SourceManager *SourceManager;
   llvm::StringRef File;
-  clang::ASTContext* AstContext;
-  clang::DiagnosticsEngine* DiagEngine;
+  clang::ASTContext *AstContext;
+  clang::DiagnosticsEngine *DiagEngine;
+  clang::DiagnosticConsumer *DiagConsumer;
 };
 
 }  // namespace ccat
