@@ -7,7 +7,7 @@
 
 namespace ccat {
 
-class LoopReverseUnsignedTypeCheck final : public CheckBase {
+class MakeUniqueReplaceNewCheck final : public CheckBase {
  public:
   bool Enabled(CCatContext *ctx) const final;
 
@@ -18,7 +18,7 @@ class LoopReverseUnsignedTypeCheck final : public CheckBase {
                  CCatContext *ctx) final;
 };
 
-struct LoopReverseUnsignedTypeCheckFactory final : public CheckFactoryBase {
+struct MakeUniqueReplaceNewCheckFactory final : public CheckFactoryBase {
   std::string_view Name() const final;
 
   CheckPtr CreateCheck() const final;

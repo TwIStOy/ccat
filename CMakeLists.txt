@@ -305,7 +305,8 @@ target_include_directories(ccat SYSTEM PRIVATE ${CLANG_INCLUDE_DIRS})
 target_sources(
   ccat
   PRIVATE ./src/main.cc ./src/ccat/action_factory.cc ./src/ccat/check_base.cc
-          ./src/utils.cc ./src/checkers/loop-reverse-unsigned-type-check.cc)
+          ./src/utils.cc ./src/checkers/loop-reverse-unsigned-type-check.cc
+          ./src/checkers/make-unique-replace-new.cc)
 
 set_property(
   SOURCE ./src/utils.cc

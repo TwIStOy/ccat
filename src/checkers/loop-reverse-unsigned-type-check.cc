@@ -22,14 +22,14 @@ bool LoopReverseUnsignedTypeCheck::Enabled(CCatContext *ctx) const {
   return true;
 }
 
-static const StatementMatcher incrementVarMatcher() {
-  return declRefExpr(to(varDecl(equalsBoundNode("initVar"))));
-}
-
 static auto InitVar = "initVar";
 
 static auto kLiteralZero = integerLiteral(equals(0));
 static auto kLiteralOne  = integerLiteral(equals(1));
+
+static const StatementMatcher incrementVarMatcher() {
+  return declRefExpr(to(varDecl(equalsBoundNode(InitVar))));
+}
 
 static auto member_function(const char *name) {
   return cxxMemberCallExpr(callee(cxxMethodDecl(hasName(name))));

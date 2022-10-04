@@ -26,6 +26,7 @@
 #include "ccat/check_base.hh"
 #include "ccat/context.hh"
 #include "checkers/loop-reverse-unsigned-type-check.hh"
+#include "checkers/make-unique-replace-new.hh"
 #include "utils.hh"
 
 using clang::PCHContainerOperations;
@@ -37,6 +38,8 @@ static llvm::cl::OptionCategory ccat_category("ccat options");
 void RegisterChecks() {
   ccat::CheckFactories::Instance().Factories.push_back(
       std::make_unique<ccat::LoopReverseUnsignedTypeCheckFactory>());
+  ccat::CheckFactories::Instance().Factories.push_back(
+      std::make_unique<ccat::MakeUniqueReplaceNewCheckFactory>());
 }
 
 int main(int argc, const char *argv[]) {
